@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> all_lines, local_lines;
     unsigned local_lines_start_from;
-    grep::lines_found local_lines_filtered;
+    std::vector<unsigned> local_numbers_filtered;
 
     grep::get_lines(all_lines, local_lines, argv[2], local_lines_start_from);
-    grep::search_string(local_lines, argv[1], local_lines_filtered, local_lines_start_from);
-    grep::print_result(local_lines_filtered, local_lines_start_from);
+    grep::search_string(local_lines, argv[1], local_numbers_filtered, local_lines_start_from);
+    grep::print_result(all_lines, local_numbers_filtered);
 
     MPI_Finalize();
     return 0;

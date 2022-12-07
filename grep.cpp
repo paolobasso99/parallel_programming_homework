@@ -48,7 +48,7 @@ void grep::get_lines(
     for (unsigned p = 0; p < size; p++)
     {
         // Add orphan elements
-        if (p < (nLinesTotal % size))
+        if (p >= (nLinesTotal % size))
         {
             nLinesLocal[p] += 1;
         }
@@ -67,7 +67,7 @@ void grep::get_lines(
         }
     }
 
-    // Save from where each processor lines will start
+    // Save from where each process lines will start
     local_lines_start_from = local_local_lines_start_from_vector[rank];
 
     // Send lines
@@ -95,8 +95,8 @@ void grep::get_lines(
 void grep::search_string(
     const std::vector<std::string> &local_lines,
     const std::string &search_string,
-    grep::lines_found &local_lines_filtered,
-    unsigned &local_lines_start_from)
+    std::vector<unsigned> &local_numbers_filtered,
+    const unsigned &local_lines_start_from)
 {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -107,95 +107,57 @@ void grep::search_string(
         std::size_t found = local_lines[l].find(search_string);
         if (found != std::string::npos)
         {
-            grep::number_and_line line_found(local_lines_start_from + l, local_lines[l]);
-            local_lines_filtered.push_back(line_found);
+            local_numbers_filtered.push_back(local_lines_start_from + l);
         }
     }
 }
 
-void grep::print_result(const grep::lines_found &local_lines_filtered, unsigned local_lines_start_from)
+void grep::print_result(const std::vector<std::string> &all_lines, const std::vector<unsigned> &local_numbers_filtered)
 {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    // Gather number of lines found for each process
-    unsigned nFoundLocal = local_lines_filtered.size();
+    // Gather number of lines found by each process
+    unsigned nFoundLocal = local_numbers_filtered.size();
     int nFound[size];
     MPI_Gather(&nFoundLocal, 1, MPI_UNSIGNED, &nFound[0], 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    // Prepare recvcounts and displs
+    // Count total number of lines found and prepare displs
     unsigned nFoundTotal;
-    std::vector<int> recvcounts(size), lineDispls(size, 0), numberDispls(size, 0);
+    std::vector<int> displs(size, 0);
     if (rank == 0)
     {
         for (unsigned p = 0; p < size; p++)
         {
             nFoundTotal += nFound[p];
-            recvcounts[p] = (grep::LINELENGTH + 1) * nFound[p];
             if (p > 0)
             {
-                lineDispls[p] = lineDispls[p - 1] + recvcounts[p - 1];
-                numberDispls[p] = numberDispls[p - 1] + nFound[p - 1];
+                displs[p] = displs[p - 1] + nFound[p - 1];
             }
         }
     }
 
-    // Gather the lines number of the found lines
-    unsigned localLinesNumbers[nFoundLocal], allLinesNumbers[nFoundTotal];
-    for (unsigned l = 0; l < nFoundLocal; l++)
-    {
-        localLinesNumbers[l] = local_lines_filtered[l].first;
-    }
-
+    // Gather the line numbers of the found lines
+    unsigned allLinesNumbers[nFoundTotal];
     MPI_Gatherv(
-        &localLinesNumbers[0],
+        &local_numbers_filtered[0],
         nFoundLocal,
         MPI_UNSIGNED,
         &allLinesNumbers[0],
         &nFound[0],
-        &numberDispls[0],
+        &displs[0],
         MPI_UNSIGNED,
         0,
         MPI_COMM_WORLD);
 
-    // Gather the lines
-    std::string linesString;
-    for (int l = 0; l < nFoundLocal; l++)
-    {
-        grep::number_and_line n_and_line = local_lines_filtered[l];
-        std::string line = n_and_line.second;
-        if (line.length() < (grep::LINELENGTH + 1))
-        {
-            line.insert(line.length(), (grep::LINELENGTH + 1) - line.length(), 0x00);
-        }
-        linesString.append(line);
-    }
-
-    char allFoundLines[nFoundTotal * (grep::LINELENGTH + 1)];
-    MPI_Gatherv(
-        &linesString[0],
-        nFoundLocal * (grep::LINELENGTH + 1),
-        MPI_CHAR,
-        &allFoundLines[0],
-        &recvcounts[0],
-        &lineDispls[0],
-        MPI_CHAR,
-        0,
-        MPI_COMM_WORLD);
-
-    // Print found lines
+    // Print found lines with all_lines[allLinesNumbers[i]]
     if (rank == 0)
     {
         std::ofstream f_stream(grep::OUTPUT_FILE);
-        for (unsigned p = 0; p < size; p++)
+        for (unsigned n = 0; n < nFoundTotal; n++)
         {
-            for (unsigned l = 0; l < nFound[p]; l++)
-            {
-                char lineCharArray[(grep::LINELENGTH + 1)];
-                std::strncpy(lineCharArray, &allFoundLines[lineDispls[p] + l * (grep::LINELENGTH + 1)], (grep::LINELENGTH + 1));
-                f_stream << allLinesNumbers[numberDispls[p] + l] << ":" << lineCharArray << std::endl;
-            }
+            f_stream << allLinesNumbers[n] << ":" << all_lines[allLinesNumbers[n]] << std::endl;
         }
         f_stream.close();
     }
