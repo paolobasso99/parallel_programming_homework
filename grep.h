@@ -10,30 +10,47 @@ namespace grep
     const int LINELENGTH = 80;
     const std::string OUTPUT_FILE = "output.txt";
 
-    /* Only process with rank 0 should read from the file,
-     * other processes must get their lines from rank 0
-     */
+    /**
+     * Get the lines from the file and split them between processes.
+     * 
+     * Args:
+     *  all_lines (std::vector<std::string>): Where process with rank 0 will store all the lines found.
+     *  local_lines (std::vector<std::string>): Where every process will have their local lines.
+     *  file_name (const std::string): The filename.
+     *  local_lines_start_from (unsigned): From which number the local lines starts.
+    */
     void get_lines(
         std::vector<std::string> &all_lines,
         std::vector<std::string> &local_lines,
         const std::string &file_name,
         unsigned &local_lines_start_from);
 
-    /* Differently from the example seen at lecture, the first input to this
-     * function is a vector containing the portion of file that must be searched
-     * by each process
-     */
+    /**
+     * Search the local lines to find the specified string and save the number of the line
+     * where the string is found.
+     * 
+     * Args:
+     *  local_lines (const std::vector<std::string>): The local lines of the process.
+     *  search_string (const std::string): The string to search.
+     *  local_matching_numbers (std::vector<unsigned>): Where to save the numbers of the matching lines.
+     *  local_lines_start_from (const unsigned): From which number the local lines starts.
+    */
     void search_string(
         const std::vector<std::string> &local_lines,
         const std::string &search_string,
-        std::vector<unsigned> &local_numbers_filtered,
+        std::vector<unsigned> &local_matching_numbers,
         const unsigned &local_lines_start_from);
 
-    /* Prints (preferrably to file) must be performed by rank 0 only, it is
-     * fine to hard-code the file path for the result in this function */
+    /**
+     * From the local numbers of the matching lines print all the matching lines.
+     * 
+     * Args:
+     *  all_lines (const std::vector<std::string>): Where process with rank 0 will store all the lines found.
+     *  local_matching_numbers (const std::vector<unsigned>): The numbers of the matching local lines.
+    */
     void print_result(
         const std::vector<std::string> &all_lines,
-        const std::vector<unsigned> &local_numbers_filtered);
+        const std::vector<unsigned> &local_matching_numbers);
 }
 
 #endif // GREP_H

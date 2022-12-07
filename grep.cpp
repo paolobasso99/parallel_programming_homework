@@ -95,7 +95,7 @@ void grep::get_lines(
 void grep::search_string(
     const std::vector<std::string> &local_lines,
     const std::string &search_string,
-    std::vector<unsigned> &local_numbers_filtered,
+    std::vector<unsigned> &local_matching_numbers,
     const unsigned &local_lines_start_from)
 {
     int rank, size;
@@ -107,19 +107,19 @@ void grep::search_string(
         std::size_t found = local_lines[l].find(search_string);
         if (found != std::string::npos)
         {
-            local_numbers_filtered.push_back(local_lines_start_from + l);
+            local_matching_numbers.push_back(local_lines_start_from + l);
         }
     }
 }
 
-void grep::print_result(const std::vector<std::string> &all_lines, const std::vector<unsigned> &local_numbers_filtered)
+void grep::print_result(const std::vector<std::string> &all_lines, const std::vector<unsigned> &local_matching_numbers)
 {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     // Gather number of lines found by each process
-    unsigned local_number_of_filtered = local_numbers_filtered.size();
+    unsigned local_number_of_filtered = local_matching_numbers.size();
     int number_of_filtered_array[size];
     MPI_Gather(&local_number_of_filtered, 1, MPI_UNSIGNED, &number_of_filtered_array[0], 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -141,7 +141,7 @@ void grep::print_result(const std::vector<std::string> &all_lines, const std::ve
     // Gather the line numbers of the found lines
     unsigned all_numbers_filtered[total_number_of_filtered];
     MPI_Gatherv(
-        &local_numbers_filtered[0],
+        &local_matching_numbers[0],
         local_number_of_filtered,
         MPI_UNSIGNED,
         &all_numbers_filtered[0],
