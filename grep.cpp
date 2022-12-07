@@ -25,14 +25,15 @@ void grep::get_lines(
         std::ifstream f_stream(file_name);
         for (std::string line; std::getline(f_stream, line);)
         {
+            if (line.length() > grep::LINELENGTH) {
+                std::cout << "There is a line longher than " << grep::LINELENGTH << std::endl;
+                exit(EXIT_FAILURE);
+            }
             ++total_number_of_lines;
             all_lines.push_back(line);
 
             // Pad with 0x00
-            if (line.length() < (grep::LINELENGTH + 1))
-            {
-                line.insert(line.length(), (grep::LINELENGTH + 1) - line.length(), 0x00);
-            }
+            line.insert(line.length(), (grep::LINELENGTH + 1) - line.length(), 0x00);
             lines_concatenated.append(line);
         }
         f_stream.close();
