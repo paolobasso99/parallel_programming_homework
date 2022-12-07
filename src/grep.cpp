@@ -158,7 +158,7 @@ void grep::print_result(const std::vector<std::string> &all_lines, const std::ve
         std::ofstream f_stream(grep::OUTPUT_FILE);
         for (unsigned n = 0; n < total_number_of_filtered; n++)
         {
-            f_stream << all_numbers_filtered[n] << ":" << all_lines[all_numbers_filtered[n]] << std::endl;
+            f_stream << all_numbers_filtered[n] << ":" << all_lines[all_numbers_filtered[n] - 1] << std::endl;
         }
         f_stream.close();
     }

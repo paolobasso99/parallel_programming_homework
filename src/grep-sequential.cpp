@@ -3,7 +3,7 @@
 #include <mpi.h>
 
 const int LINELENGTH = 80;
-const std::string OUTPUT_FILE = "output-sequential.txt";
+const std::string OUTPUT_FILE = "outputs/output-sequential.txt";
 
 int main(int argc, char *argv[])
 {
