@@ -8,7 +8,7 @@
 namespace grep
 {
     const int LINELENGTH = 80;
-    const std::string OUTPUT_FILE = "output.txt";
+    const std::string OUTPUT_FILE = "output-mpi.txt";
 
     /**
      * Get the lines from the file and split them between processes.

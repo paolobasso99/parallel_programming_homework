@@ -1,4 +1,5 @@
 *.exe
 .venv
-output.txt
+output-mpi.txt
+output-sequential.txt
 tempCodeRunnerFile.cpp
