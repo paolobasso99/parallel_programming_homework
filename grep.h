@@ -8,6 +8,7 @@
 namespace grep
 {
     const int LINELENGTH = 80;
+    const std::string OUTPUT_FILE = "output.txt";
 
     typedef std::pair<unsigned, std::string> number_and_line;
 

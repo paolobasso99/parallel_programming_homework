@@ -25,10 +25,6 @@ int main(int argc, char *argv[])
     }
 
     grep::split_lines(input_lines, local_lines_number);
-/*     for (unsigned l = 0; l < input_lines.size(); l++)
-    {
-        std::cout << "p" << rank << " " << l + local_lines_number << ":" << input_lines[l] << std::endl;
-    } */
     grep::search_string(input_lines, argv[1], local_filtered_lines, local_lines_number);
     input_lines.clear();  
     grep::print_result(local_filtered_lines, local_lines_number);
