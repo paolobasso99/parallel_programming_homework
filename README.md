@@ -29,12 +29,12 @@ The following files and folder are present:
 - [Grep_Homework_Question.ipynb](Grep_Homework_Question.ipynb): contains the homework prompt.
 - [Grep_Homework_Solution.ipynb](Grep_Homework_Solution.ipynb): contains my solution.
 - [input_file.txt](input_file.txt): The input file to test the program
-- [`src/`](src/): Folder containing `cpp` source files.
-  - [`grep-sequential.cpp`](src/grep-sequential.cpp): A sequential implementation of grep which also measures the enlapsed time.
-  - [`grep-main.cpp`](src/grep-main.cpp): The `main` function of the parallel implementation.
-  - [`grep.cpp`](src/grep.cpp): The implementation `grep-mpi` helper functions the parallel implementation.
-  - [`grep.h`](src/grep.h): The header file of `grep-mpi` helper functions the parallel implementation.
-- [`outputs/`](outputs/): Folder which will contain the outputs.
-  - [`output-correct.txt`](outputs/output-correct.txt): The correct output of the normal `grep`.
-- [`dest/`](dest/): Folder which will contain the compiled executable files.
-- [`.vscode/`](.vscode/): Folder containing some VS Code configurations.
+- [src/](src/): Folder containing `cpp` source files.
+  - [grep-sequential.cpp](src/grep-sequential.cpp): A sequential implementation of grep which also measures the enlapsed time.
+  - [grep-main.cpp](src/grep-main.cpp): The `main` function of the parallel implementation.
+  - [grep.cpp](src/grep.cpp): The implementation `grep-mpi` helper functions the parallel implementation.
+  - [grep.h](src/grep.h): The header file of `grep-mpi` helper functions the parallel implementation.
+- [outputs/](outputs/): Folder which will contain the outputs.
+  - [output-correct.txt](outputs/output-correct.txt): The correct output of the normal `grep`.
+- [dest/](dest/): Folder which will contain the compiled executable files.
+- [.vscode/](.vscode/): Folder containing some VS Code configurations.
