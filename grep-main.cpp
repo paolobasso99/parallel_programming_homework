@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
     }
 
     MPI_Init(&argc, &argv);
+    double init_time = MPI_Wtime();
+
     int rank, size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -23,6 +25,10 @@ int main(int argc, char *argv[])
     grep::get_lines(all_lines, local_lines, argv[2], local_lines_start_from);
     grep::search_string(local_lines, argv[1], local_matching_numbers, local_lines_start_from);
     grep::print_result(all_lines, local_matching_numbers);
+
+    if (rank == 0) {
+        std::cout << "Enlapsed time: " <<  (MPI_Wtime() - init_time)*1000 << "ms" << std::endl;
+    }
 
     MPI_Finalize();
     return 0;

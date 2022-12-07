@@ -47,6 +47,6 @@
         "fstream": "cpp",
         "cstring": "cpp"
     },
-    "code-runner.customCommand": "mpicxx -fdiagnostics-color=always -g grep-main.cpp grep.cpp -o grep.exe && mpiexec -np 4 grep matter input_file.txt",
+    "code-runner.customCommand": "mpicxx -fdiagnostics-color=always -g grep-main.cpp grep.cpp -o grep-mpi.exe && mpiexec -np 4 grep-mpi matter input_file.txt",
     "code-runner.saveFileBeforeRun": true
 }

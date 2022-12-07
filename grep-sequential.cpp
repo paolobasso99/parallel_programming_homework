@@ -1,9 +1,6 @@
 #include <iostream>
-#include <iostream>
-#include <sstream>
 #include <fstream>
-#include <string>
-#include <cstring>
+#include <mpi.h>
 
 const int LINELENGTH = 80;
 const std::string OUTPUT_FILE = "output-sequential.txt";
@@ -15,6 +12,9 @@ int main(int argc, char *argv[])
         std::cout << "Expected 2 inputs, got " << argc - 1 << std::endl;
         return 0;
     }
+
+    MPI_Init(&argc, &argv);
+    double init_time = MPI_Wtime();
 
     std::ofstream f_stream_out(OUTPUT_FILE);
     std::ifstream f_stream_in(argv[2]);
@@ -38,5 +38,8 @@ int main(int argc, char *argv[])
     f_stream_in.close();
     f_stream_out.close();
 
+    std::cout << "Enlapsed time: " <<  (MPI_Wtime() - init_time)*1000 << "ms" << std::endl;
+
+    MPI_Finalize();
     return 0;
 }
