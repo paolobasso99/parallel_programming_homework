@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Windows",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:\\Program Files\\Microsoft MPI\\Bin"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "C:\\msys64\\mingw64\\bin\\mpicxx.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
