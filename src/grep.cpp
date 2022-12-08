@@ -107,9 +107,10 @@ void grep::search_string(
     std::vector<unsigned> &local_matching_numbers,
     const unsigned &local_lines_start_from)
 {
+    std::size_t found;
     for (int l = 0; l < local_lines.size(); l++)
     {
-        std::size_t found = local_lines[l].find(search_string);
+        found = local_lines[l].find(search_string);
         if (found != std::string::npos)
         {
             local_matching_numbers.push_back(local_lines_start_from + l);
@@ -129,7 +130,7 @@ void grep::print_result(
     MPI_Gather(&local_number_of_filtered, 1, MPI_UNSIGNED, &number_of_filtered_array[0], 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     // Count total number of lines found and prepare displs
-    unsigned total_number_of_filtered;
+    unsigned total_number_of_filtered = 0;
     std::vector<int> displs(size, 0);
     if (rank == 0)
     {
