@@ -4,7 +4,7 @@ This is my solution to an homework done at the PARALLEL PROGRAMMING course at Po
 The prompt was to build a parallel version of the `grep` program using [MPI](https://www.open-mpi.org/).
 The homework prompt is aviable in [Grep_Homework_Question notebook](Grep_Homework_Question.ipynb) while my solution is in the[Grep_Homework_Solution notebook](Grep_Homework_Solution.ipynb).
 
-You can open the solution directly on colab: [![Open In Colab](https://colab.research.google.com/drive/1pJeTKclsDqKVQEQ73SSDkJffCRzFOho1?usp=sharing)
+You can open the solution directly on colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/paolobasso99/parallel_programming_homework/blob/main/Grep_Homework_Solution_Colab.ipynb)
 
 ## Setup
 This homework is in C++ so you need a development envirorment that supports it, if you need help I found [this good guide](https://code.visualstudio.com/docs/languages/cpp).
