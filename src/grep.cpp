@@ -78,23 +78,23 @@ void grep::split_lines(
     local_lines_start_from = local_lines_start_from_vector[rank];
 
     // Send lines
-    char linesLocal[sendcounts[rank]];
+    char local_lines_char_array[sendcounts[rank]];
     MPI_Scatterv(
         &all_lines[0],
         &sendcounts[0],
         &displs[0],
         MPI_CHAR,
-        &linesLocal[0],
+        &local_lines_char_array[0],
         sendcounts[rank],
         MPI_CHAR,
         0,
         MPI_COMM_WORLD);
 
     // Save lines in local_lines
+    char line_as_char_array[(grep::LINELENGTH + 1)];
     for (unsigned l = 0; l < local_number_of_lines[rank]; l++)
     {
-        char line_as_char_array[(grep::LINELENGTH + 1)];
-        std::strncpy(line_as_char_array, &linesLocal[l * (grep::LINELENGTH + 1)], (grep::LINELENGTH + 1));
+        std::strncpy(line_as_char_array, &local_lines_char_array[l * (grep::LINELENGTH + 1)], (grep::LINELENGTH + 1));
         local_lines.push_back(line_as_char_array);
     }
 }
@@ -160,9 +160,9 @@ void grep::print_result(
     if (rank == 0)
     {
         std::ofstream f_stream(grep::OUTPUT_FILE);
+        char line_as_char_array[(grep::LINELENGTH + 1)];
         for (unsigned n = 0; n < total_number_of_filtered; n++)
         {
-            char line_as_char_array[(grep::LINELENGTH + 1)];
             std::strncpy(
                 line_as_char_array,
                 &all_lines[(all_numbers_filtered[n] - 1) * (grep::LINELENGTH + 1)],
