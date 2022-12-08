@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     double start_time = MPI_Wtime();
 
     std::string all_lines;
-    std::vector<std::string> local_lines;
+    std::string local_lines;
     unsigned local_lines_start_from, total_number_of_lines;
     std::vector<unsigned> local_matching_numbers;
 
@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     }
 
     grep::search_string(rank, size, local_lines, argv[1], local_matching_numbers, local_lines_start_from);
+    local_lines.clear();
     double search_string_time = MPI_Wtime();
     if (rank == 0)
     {
@@ -52,7 +53,6 @@ int main(int argc, char *argv[])
         std::cout << "Print results time: " << (print_results_time - search_string_time) * 1000 << "ms" << std::endl;
         std::cout << "Total enlapsed time: " << (print_results_time - start_time) * 1000 << "ms" << std::endl;
     }
-
 
     MPI_Finalize();
     return 0;

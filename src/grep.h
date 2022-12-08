@@ -36,7 +36,7 @@ namespace grep
      *  all_lines (const std::string): Where process with rank 0 will store all the lines, concatenated
      *      one every (LINELENGTH + 1) characters (+1 is for null terminator), padded with null terminators.
      *  total_number_of_lines (const unsigned): Total number of lines in the file.
-     *  local_lines (std::vector<std::string>): Where every process will have their local lines.
+     *  local_lines (std::string): Where every process will have their local lines as a concatenated string.
      *  local_lines_start_from (unsigned): From which number the local lines starts.
      */
     void split_lines(
@@ -44,7 +44,7 @@ namespace grep
         const unsigned &size,
         const std::string &all_lines,
         const unsigned &total_number_of_lines,
-        std::vector<std::string> &local_lines,
+        std::string &local_lines,
         unsigned &local_lines_start_from);
 
     /**
@@ -54,7 +54,7 @@ namespace grep
      * Args:
      *  rank (const unsigned): The rank of the process executing the function.
      *  size (const unsigned): The size of the communication channel.
-     *  local_lines (const std::vector<std::string>): The local lines of the process.
+     *  local_lines (const std::string): The local lines of the process as a concatenated string.
      *  search_string (const std::string): The string to search.
      *  local_matching_numbers (std::vector<unsigned>): Where to save the numbers of the matching lines.
      *  local_lines_start_from (const unsigned): From which number the local lines starts.
@@ -62,7 +62,7 @@ namespace grep
     void search_string(
         const unsigned &rank,
         const unsigned &size,
-        const std::vector<std::string> &local_lines,
+        const std::string &local_lines,
         const std::string &search_string,
         std::vector<unsigned> &local_matching_numbers,
         const unsigned &local_lines_start_from);

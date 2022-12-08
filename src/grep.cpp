@@ -45,7 +45,7 @@ void grep::split_lines(
     const unsigned &size,
     const std::string &all_lines,
     const unsigned &total_number_of_lines,
-    std::vector<std::string> &local_lines,
+    std::string &local_lines,
     unsigned &local_lines_start_from)
 {
     // Split lines evenly between processes
@@ -78,42 +78,44 @@ void grep::split_lines(
     local_lines_start_from = local_lines_start_from_vector[rank];
 
     // Send lines
-    char local_lines_char_array[sendcounts[rank]];
+    local_lines.resize(sendcounts[rank]);
     MPI_Scatterv(
         &all_lines[0],
         &sendcounts[0],
         &displs[0],
         MPI_CHAR,
-        &local_lines_char_array[0],
+        &local_lines[0],
         sendcounts[rank],
         MPI_CHAR,
         0,
         MPI_COMM_WORLD);
-
-    // Save lines in local_lines
-    char line_as_char_array[(grep::LINELENGTH + 1)];
-    for (unsigned l = 0; l < local_number_of_lines[rank]; l++)
-    {
-        std::strncpy(line_as_char_array, &local_lines_char_array[l * (grep::LINELENGTH + 1)], (grep::LINELENGTH + 1));
-        local_lines.push_back(line_as_char_array);
-    }
 }
 
 void grep::search_string(
     const unsigned &rank,
     const unsigned &size,
-    const std::vector<std::string> &local_lines,
+    const std::string &local_lines,
     const std::string &search_string,
     std::vector<unsigned> &local_matching_numbers,
     const unsigned &local_lines_start_from)
 {
-    std::size_t found;
-    for (int l = 0; l < local_lines.size(); l++)
+    std::size_t found, pos;
+    unsigned current_line = 0, matching_line_number = 0;
+    bool completed = false;
+    while (completed == false)
     {
-        found = local_lines[l].find(search_string);
+        found = std::string::npos;
+        pos = current_line * (grep::LINELENGTH + 1);
+        found = local_lines.find(search_string, pos);
         if (found != std::string::npos)
         {
-            local_matching_numbers.push_back(local_lines_start_from + l);
+            matching_line_number = found / (grep::LINELENGTH + 1);
+            current_line = matching_line_number + 1;
+            local_matching_numbers.push_back(local_lines_start_from + matching_line_number);
+        }
+        else
+        {
+            completed = true;
         }
     }
 }
