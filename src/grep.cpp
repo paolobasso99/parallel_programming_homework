@@ -8,39 +8,46 @@
 #include "grep.h"
 
 void grep::get_lines(
+    const unsigned &rank,
+    const unsigned &size,
     std::string &all_lines,
-    std::vector<std::string> &local_lines,
-    const std::string &file_name,
-    unsigned &local_lines_start_from)
+    unsigned &total_number_of_lines,
+    const std::string &file_name)
 {
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    // Read file, count lines and build long string of concatenated lines, seprated by 0x00
-    unsigned total_number_of_lines = 0;
     if (rank == 0)
     {
         std::ifstream f_stream(file_name);
+        unsigned counter = 0;
         for (std::string line; std::getline(f_stream, line);)
         {
-            if (line.length() > grep::LINELENGTH) {
+            if (line.length() > grep::LINELENGTH)
+            {
                 std::cout << "There is a line longher than " << grep::LINELENGTH << std::endl;
                 exit(EXIT_FAILURE);
             }
 
-            ++total_number_of_lines;
+            ++counter;
 
             // Pad with 0x00
             line.insert(line.length(), (grep::LINELENGTH + 1) - line.length(), 0x00);
             all_lines.append(line);
         }
         f_stream.close();
+        total_number_of_lines = counter;
     }
 
     // Send total number of lines to all
     MPI_Bcast(&total_number_of_lines, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+}
 
+void grep::split_lines(
+    const unsigned &rank,
+    const unsigned &size,
+    const std::string &all_lines,
+    const unsigned &total_number_of_lines,
+    std::vector<std::string> &local_lines,
+    unsigned &local_lines_start_from)
+{
     // Split lines evenly between processes
     std::vector<unsigned> local_number_of_lines(size, total_number_of_lines / size);
     std::vector<int> sendcounts(size), displs(size, 0);
@@ -93,15 +100,13 @@ void grep::get_lines(
 }
 
 void grep::search_string(
+    const unsigned &rank,
+    const unsigned &size,
     const std::vector<std::string> &local_lines,
     const std::string &search_string,
     std::vector<unsigned> &local_matching_numbers,
     const unsigned &local_lines_start_from)
 {
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
     for (int l = 0; l < local_lines.size(); l++)
     {
         std::size_t found = local_lines[l].find(search_string);
@@ -112,12 +117,12 @@ void grep::search_string(
     }
 }
 
-void grep::print_result(const std::string &all_lines, const std::vector<unsigned> &local_matching_numbers)
+void grep::print_result(
+    const unsigned &rank,
+    const unsigned &size,
+    const std::string &all_lines,
+    const std::vector<unsigned> &local_matching_numbers)
 {
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
     // Gather number of lines found by each process
     unsigned local_number_of_filtered = local_matching_numbers.size();
     int number_of_filtered_array[size];

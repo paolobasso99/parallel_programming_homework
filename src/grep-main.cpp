@@ -20,15 +20,17 @@ int main(int argc, char *argv[])
 
     std::string all_lines;
     std::vector<std::string> local_lines;
-    unsigned local_lines_start_from;
+    unsigned local_lines_start_from, total_number_of_lines;
     std::vector<unsigned> local_matching_numbers;
 
-    grep::get_lines(all_lines, local_lines, argv[2], local_lines_start_from);
-    grep::search_string(local_lines, argv[1], local_matching_numbers, local_lines_start_from);
-    grep::print_result(all_lines, local_matching_numbers);
+    grep::get_lines(rank, size, all_lines, total_number_of_lines, argv[2]);
+    grep::split_lines(rank, size, all_lines, total_number_of_lines, local_lines, local_lines_start_from);
+    grep::search_string(rank, size, local_lines, argv[1], local_matching_numbers, local_lines_start_from);
+    grep::print_result(rank, size, all_lines, local_matching_numbers);
 
-    if (rank == 0) {
-        std::cout << "Enlapsed time: " <<  (MPI_Wtime() - init_time)*1000 << "ms" << std::endl;
+    if (rank == 0)
+    {
+        std::cout << "Enlapsed time: " << (MPI_Wtime() - init_time) * 1000 << "ms" << std::endl;
     }
 
     MPI_Finalize();
