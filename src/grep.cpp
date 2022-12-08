@@ -8,7 +8,7 @@
 #include "grep.h"
 
 void grep::get_lines(
-    std::vector<std::string> &all_lines,
+    std::string &all_lines,
     std::vector<std::string> &local_lines,
     const std::string &file_name,
     unsigned &local_lines_start_from)
@@ -18,7 +18,6 @@ void grep::get_lines(
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     // Read file, count lines and build long string of concatenated lines, seprated by 0x00
-    std::string lines_concatenated;
     unsigned total_number_of_lines = 0;
     if (rank == 0)
     {
@@ -29,12 +28,12 @@ void grep::get_lines(
                 std::cout << "There is a line longher than " << grep::LINELENGTH << std::endl;
                 exit(EXIT_FAILURE);
             }
+
             ++total_number_of_lines;
-            all_lines.push_back(line);
 
             // Pad with 0x00
             line.insert(line.length(), (grep::LINELENGTH + 1) - line.length(), 0x00);
-            lines_concatenated.append(line);
+            all_lines.append(line);
         }
         f_stream.close();
     }
@@ -74,7 +73,7 @@ void grep::get_lines(
     // Send lines
     char linesLocal[sendcounts[rank]];
     MPI_Scatterv(
-        &lines_concatenated[0],
+        &all_lines[0],
         &sendcounts[0],
         &displs[0],
         MPI_CHAR,
@@ -113,7 +112,7 @@ void grep::search_string(
     }
 }
 
-void grep::print_result(const std::vector<std::string> &all_lines, const std::vector<unsigned> &local_matching_numbers)
+void grep::print_result(const std::string &all_lines, const std::vector<unsigned> &local_matching_numbers)
 {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -158,7 +157,12 @@ void grep::print_result(const std::vector<std::string> &all_lines, const std::ve
         std::ofstream f_stream(grep::OUTPUT_FILE);
         for (unsigned n = 0; n < total_number_of_filtered; n++)
         {
-            f_stream << all_numbers_filtered[n] << ":" << all_lines[all_numbers_filtered[n] - 1] << std::endl;
+            char line_as_char_array[(grep::LINELENGTH + 1)];
+            std::strncpy(
+                line_as_char_array,
+                &all_lines[(all_numbers_filtered[n] - 1) * (grep::LINELENGTH + 1)],
+                (grep::LINELENGTH + 1));
+            f_stream << all_numbers_filtered[n] << ":" << line_as_char_array << std::endl;
         }
         f_stream.close();
     }

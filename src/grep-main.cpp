@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    std::vector<std::string> all_lines, local_lines;
+    std::string all_lines;
+    std::vector<std::string> local_lines;
     unsigned local_lines_start_from;
     std::vector<unsigned> local_matching_numbers;
 
