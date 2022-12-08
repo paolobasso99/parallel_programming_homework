@@ -10,6 +10,7 @@ packages = [{include = "parallel_programming_homework"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 ipykernel = "^6.17.1"
+matplotlib = "^3.6.2"
 
 
 [tool.poetry.group.dev.dependencies]
